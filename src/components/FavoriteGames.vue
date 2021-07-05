@@ -1,13 +1,14 @@
 <template>
   <div>
     <GamePreview
-      v-for="g in games"
-      :id="g.id" 
+      v-for="g in matches"
+      :match_id="g.match_id" 
       :hostTeam="g.hostTeam" 
-      :guestTeam="g.guestTeam" 
-      :date="g.date" 
+      :awayTeam="g.awayTeam" 
+      :date_match_new="g.date_match_new" 
       :hour="g.hour" 
-      :key="g.id"></GamePreview>
+      :venue="g.venue_name"
+      :key="g.match_id"></GamePreview>
   </div>
 </template>
 
@@ -20,45 +21,32 @@ export default {
   }, 
   data() {
     return {
-      games: [
-        {
-          id:25,
-          hostTeam: "Maccabi Tel-Aviv",
-          guestTeam: "Hapoel Beer-Sheva",
-          date: "27/5/21",
-          hour: "20:00"
-        },
-        {
-          id:39,
-          hostTeam: "Hapoel Tel-Aviv",
-          guestTeam: "Maccabi Haifa",
-          date: "29/5/21",
-          hour: "20:00"
-        }
-      ]
+      matches: this.matches
     };
   },
-  // methods: {
-  //   async updateGames(){
-  //     console.log("response");
-  //     try {
-  //       const response = await this.axios.get(
-  //         "http://localhost:3000/games/favoriteGames",
-  //       );
-  //       const games = response.data.games;
-  //       this.games = [];
-  //       this.games.push(...games);
-  //       console.log(response);
-  //     } catch (error) {
-  //       console.log("error in update games")
-  //       console.log(error);
-  //     }
-  //   }
-  // }, 
-  // mounted(){
-  //   console.log("favorite games mounted");
-  //   this.updateGames(); 
-  // }
+  methods: {
+    async updateMatches(){
+      console.log("response");
+      try {
+        const response = await this.axios.get(
+          "http://localhost:3000/users/favoriteMatchesTop3",
+        );
+        console.log(response);
+        console.log(response.data);
+        const games = response.data.matches;
+        this.matches = [];
+        this.matches.push(...games);
+        console.log(response);
+      } catch (error) {
+        console.log("error in update updateMatches")
+        console.log(error);
+      }
+    }
+  }, 
+  mounted(){
+    console.log("favorite updateMatches mounted");
+    this.updateMatches(); 
+  }
 };
 </script>
 

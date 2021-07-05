@@ -11,6 +11,18 @@
         Season: {{ season }}
         <br/>
         Stage: {{ stage }}
+        <br/>
+        <div>     
+          <GamePreview
+            :match_id="next_match.match_id" 
+            :hostTeam="next_match.hostTeam" 
+            :awayTeam="next_match.awayTeam" 
+            :date_match_new="next_match.date_match_new" 
+            :hour="next_match.hour" 
+            :venue="next_match.venue_name" 
+            :key="next_match.match_id">
+          </GamePreview>
+        </div>
       </b-card-text>
       <b-button href="#" variant="primary">Go somewhere</b-button>
     </b-card>
@@ -18,14 +30,40 @@
 </template>
 
 <script>
+import GamePreview from "./GamePreview.vue";
 export default {
- data() {
+  name : "LeagueInfo",
+  components: {
+    GamePreview,
+  },
+  data() {
     return {
-      leagueName: "superliga", 
-      season: "season", 
-      stage: "stage"
+      leagueName : "", 
+      season : "", 
+      stage : "",
+      next_match : [],
     };
   },
+  methods: {
+    async getDetails() {
+      try {
+        const response = await this.axios.get(
+          `http://localhost:3000/league/getDetails`
+        );
+        this.leagueName = response.data.league_name;
+        this.season = response.data.current_season_name;
+        this.stage = response.data.current_stage_name;
+        this.next_match = response.data.next_match;
+
+      } catch (err) {
+        console.log(err.response);
+      }
+    },
+  },
+  mounted(){
+    console.log("league details");
+    this.getDetails(); 
+  }
 }
 </script>
 

@@ -72,19 +72,19 @@ export default {
       form: {
         username: "",
         password: "",
-        submitError: undefined
-      }
+        submitError: undefined,
+      },
     };
   },
   validations: {
     form: {
       username: {
-        required, 
+        required,
       },
       password: {
-        required
-      }
-    }
+        required,
+      },
+    },
   },
   methods: {
     validateState(param) {
@@ -93,25 +93,36 @@ export default {
     },
     async Login() {
       try {
-        const response = await this.axios.post(
-          "https://localhost:3000/user/Login",
-          {
-            username: this.form.username,
-            password: this.form.password
-          }
-        );
-        // console.log(response);
-        // this.$root.loggedIn = true;
-        console.log(this.$root.store.login);
-        this.$root.store.login(this.form.username);
-        this.$router.push("/");
+        console.log("ggggg");
+        const response = await this.axios.post("http://localhost:3000/login", {
+          username: this.form.username,
+          password: this.form.password,
+        });
+        // .then(function(response){
+        //   document.cookie = this.$cookies.get("session");
+        // })
+        console.log(response);
+        // console.log(this.$cookies.get("session"));
+
+        if (response.status === 200) {
+          this.$root.loggedIn = true;
+          this.$root.store.username = this.form.username;  
+          console.log(this.$root.store);
+          console.log(this.$root.store.login);
+          this.$root.store.login(this.form.username);
+          this.$router.push("/");
+        } else {
+          this.form.submitError = err.response.data.message;
+        }
       } catch (err) {
         console.log(err.response);
-        this.form.submitError = err.response.data.message;
+        // this.form.submitError = response.data;
+        alert("Incorrect details !");
       }
+      // console.log(this.$cookies.get("session"));
     },
     onLogin() {
-      // console.log("login method called");
+      console.log("login method called");
       this.form.submitError = undefined;
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
@@ -120,8 +131,8 @@ export default {
       // console.log("login method go");
 
       this.Login();
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

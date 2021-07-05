@@ -1,13 +1,14 @@
 <template>
   <div class="game-preview">
-    <div :title="id" class="game-title">
-      <b>Game Id:</b> {{ id }}
+    <div class="game-title">
+      <b>Game Id:</b> {{ match_id }}
     </div>
     <ul class="game-content">
       <li> host: {{ hostTeam }}</li>
-      <li> guest: {{ guestTeam }}</li>
-      <li> date: {{ date }}</li>
+      <li> guest: {{ awayTeam }}</li>
+      <li> date: {{ date_match_new }}</li>
       <li> time: {{ hour }}</li>
+      <li> venue: {{ venue }}</li>
     </ul>
   </div>
 </template>
@@ -16,7 +17,7 @@
 export default {
   name: "GamePreview",
   props: {
-      id: {
+      match_id: {
         type: Number,
         required: true
       },
@@ -24,15 +25,19 @@ export default {
         type: String,
         required: true
       },
-      guestTeam: {
+      awayTeam: {
         type: String,
         required: true
       },
-      date: {
+      date_match_new: {
         type: String,
         required: true
       },
       hour: {
+        type: String,
+        required: true
+      },
+      venue: {
         type: String,
         required: true
       }
