@@ -43,6 +43,7 @@ import {
   LayoutPlugin, 
   InputGroupPlugin
 ].forEach((x) => Vue.use(x));
+
 Vue.use(Vuelidate);
 
 axios.interceptors.request.use(
@@ -73,7 +74,9 @@ Vue.use(VueAxios, axios);
 Vue.config.productionTip = false;
 
 const shared_data = {
-  username: localStorage.username,
+  username: undefined,
+  //username: localStorage.username,
+  BASE_URL: "http://localhost:3000",
   //username: "hilla",
   login(username) {
     localStorage.setItem("username", username);

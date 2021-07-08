@@ -3,9 +3,9 @@
     <GamePreview
       v-for="g in matches"
       :match_id="g.match_id" 
-      :hostTeam="g.hostTeam" 
-      :awayTeam="g.awayTeam" 
-      :date_match_new="g.date_match_new" 
+      :hostTeam="g.local_team" 
+      :awayTeam="g.visitor_Team" 
+      :date_match_new="g.date_game" 
       :hour="g.hour" 
       :venue="g.venue_name"
       :key="g.match_id"></GamePreview>
@@ -21,19 +21,26 @@ export default {
   }, 
   data() {
     return {
-      matches: this.matches
+      matches: [],
     };
+  },
+  created() {
+    console.log("favorite updateMatches mounted");
+    this.updateMatches();   
   },
   methods: {
     async updateMatches(){
       console.log("response");
       try {
+        console.log("here");
+        console.log(this.$root.store);
+        console.log(this.$root.store.BASE_URL + "/users/favoriteMatchesTop3");
         const response = await this.axios.get(
-          "http://localhost:3000/users/favoriteMatchesTop3",
+          this.$root.store.BASE_URL + "/users/favoriteMatchesTop3",
         );
         console.log(response);
         console.log(response.data);
-        const games = response.data.matches;
+        const games = response.data;
         this.matches = [];
         this.matches.push(...games);
         console.log(response);
@@ -41,12 +48,8 @@ export default {
         console.log("error in update updateMatches")
         console.log(error);
       }
-    }
+    },
   }, 
-  mounted(){
-    console.log("favorite updateMatches mounted");
-    this.updateMatches(); 
-  }
 };
 </script>
 

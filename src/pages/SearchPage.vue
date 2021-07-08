@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 class="title" align = "center">Search Page</h1>
     <div class="container">
       <div class="left-half">
         <h2 class="title" align = "center">Search Team</h2>
@@ -11,8 +10,14 @@
               <b-button variant="success" @click="findSearchTeam">Search</b-button>
             </b-input-group-append>
           </b-input-group>
-          <br/>
-          <br/>
+          <br>
+          <div align = "center">
+            <span><h6 style="font-weight: bold;">Sort teams by alphabetical order</h6></span>
+            <input type="checkbox" id="checkBox" v-model="sortTeams" value="sortByName" 
+            @change="sortTeamsByAlphabet">  
+          </div>
+          <br> 
+          <br>
         </div>
         <div class="content">
           <b-carousel
@@ -46,36 +51,49 @@
             <b-form-input v-model="searchPlayer"></b-form-input>
           </b-input-group>
           <br/>
-          <div>
-            <h5 class="title" >Filter By: (OPTIONAL)</h5>
-            <!-- Using modifiers -->
-            <b-button @click="showDropDown" v-b-toggle.collapse-2 class="m-1">Position</b-button>
+          <div align="center"> 
+            <div class="right-half" align = "center" style="width: 70%;">
+              <h6 class="title" style="font-weight: bold;">Filter By: (OPTIONAL)</h6>
+              <!-- Using modifiers -->
+              <b-button @click="showDropDown" v-b-toggle.collapse-2 class="m-1">Position</b-button>
+              <!-- Using value -->
+              <b-button @click="showTextTeam" v-b-toggle="'collapse-2'" class="m-1">Team name</b-button>
+              <b-button align= "center" variant="success" @click="findSearchPlayer">Search</b-button>
+              <br>
+              <br>
+              <!-- Element to collapse -->
+              <b-collapse id="collapse-2">
+                <b-card v-if="showDropDownPos===true" class="background-search">
+                  <b-dropdown dropright size="sm" :text="buttonTitle" split-class="m-2">
+                    <b-dropdown-item @click="buttonTitle = i " v-for="i in 11" :key="i">{{ i }}</b-dropdown-item>
+                  </b-dropdown>
+                </b-card>
+                <b-card v-else-if="showText===true" class="background-search">
+                  <b-form-input v-model="textTeam"></b-form-input>
 
-            <!-- Using value -->
-            <b-button @click="showTextTeam" v-b-toggle="'collapse-2'" class="m-1">Name of team</b-button>
-
-            <!-- Element to collapse -->
-            <b-collapse id="collapse-2">
-              <b-card v-if="showDropDownPos===true" class="background-search">
-                <b-dropdown dropright size="sm" :text="buttonTitle" split-class="m-2">
-                  <b-dropdown-item @click="buttonTitle = i " v-for="i in 11" :key="i">{{ i }}</b-dropdown-item>
-                </b-dropdown>
-                <span>Selected: {{ buttonTitle }}</span>
-              </b-card>
-              <b-card v-else-if="showText===true" class="background-search">
-                <b-form-input v-model="textTeam"></b-form-input>
-                <span>Selected: {{ textTeam }}</span>
-
-              </b-card>
-            </b-collapse>
+                </b-card>
+              </b-collapse>
+              <br>
+              <br>
+            </div>
+            <div class="left-half" style="width: 30%;">
+              <div align = "center">
+                <span><h6 style="font-weight: bold;">Sort by name</h6></span>
+                <input type="checkbox" :disabled="sortByTeam ? true : false" id="checkBox" v-model="sortByName" value="sortPlayerByName" 
+                @change="sortPlayersByName">  
+              </div>
+              <div align = "center">
+                <span><h6 style="font-weight: bold;">Sort by team</h6></span>
+                <input type="checkbox" :disabled="sortByName ? true : false" id="checkBox" v-model="sortByTeam" value="sortPlayerByTeam" 
+                @change="sortPlayersByTeam">  
+              </div>
+            </div>
+            <br>
+            <br>
+            <span v-if="searchPlayerClicked && players.length>0" class="mt-4"> found: {{ this.players.length }} results<br></span>
+            <span v-else-if="searchPlayerClicked && players.length==0" class="mt-4"> No players found<br></span>
+            
           </div>
-          <br>
-          <br>
-          <br>
-          <div>
-            <b-button align= "center" variant="success" @click="findSearchPlayer">Search</b-button>
-          </div>
-          <br>
           <br>
           <div class="content">
             <b-carousel
@@ -102,8 +120,6 @@
                             </PlayerPreview>
                     </b-carousel-slide>
             </b-carousel>
-            <span v-if="searchPlayerClicked && players.length>0" class="mt-4"> found: {{ this.players.length }} results<br></span>
-            <span v-else-if="searchPlayerClicked && players.length==0" class="mt-4"> No players found<br></span>
           
          </div>
           <!-- Your search Query: {{ searchPlayer }} -->
@@ -135,15 +151,27 @@ export default {
       searchTeamClicked: false, /// hide/show the answers of the other search (there is a team search and a player search)
       searchPlayerClicked: false, /// hide/show the answers of the other search (there is a team search and a player search)
       buttonTitle: "optional",
-      
+      sortTeams:false,
+      sortByName:false,
+      sortByTeam:false,
       //details for the TeamSearch
       searchTeam: "",
+      searchQuery: "",
       teams: [],
       slide: 0,
       sliding: null,
-
     };
   },
+  // mounted(){
+  //   try{
+  //     if(this.$root.store.username){
+  //       this.getLastQueryResults();
+  //     }
+  //   }
+  //   catch(error){
+  //     console.log(error);
+  //   }
+  // },
   methods: {
     onSlideStart(slide) {
       this.sliding = true
@@ -164,26 +192,33 @@ export default {
     async findSearchTeam(){
       console.log(this.searchTeam);
       if(this.searchTeam!= ""){
-        try {
-          const response = await this.axios.get(
-            `http://localhost:3000/search/searchTeamByName/${this.searchTeam}`,
-          );
-          if(response.data.status == 204)
-            this.teams = [];           
-          else
-            this.teams = response.data;
+        if(this.searchQuery!=""){
+          if(this.$root.store.username){//if user is logged in, save last query search
+            this.$root.store.saveLastSearch(this.searchQuery);
+          }
+          this.search=true;
+          try {
+            const response = await this.axios.get(
+              `http://localhost:3000/search/searchTeamByName/${this.searchTeam}`,
+            );
+            if(response.data.status == 204)
+              this.teams = [];           
+            else
+              this.teams = response.data;
 
-          console.log(response);
-          this.searchTeamClicked = true;
-          this.searchPlayerClicked = false;
-        } catch (error) {
-          console.log("error in teamView")
-          console.log(error);
-        }
+            console.log(response);
+            this.searchTeamClicked = true;
+            this.searchPlayerClicked = false;
+          } catch (error) {
+            console.log("error in teamView")
+            console.log(error);
+          }
+      }
       }
       else{
         alert("Please insert name of team!")
       }
+      this.search=false;
     },
     async findSearchPlayer(){
       console.log(this.searchPlayer);
@@ -224,7 +259,29 @@ export default {
       else{
         alert("Please insert name of player!")
       } 
-    }
+    },
+    sortTeamsByAlphabet(){
+      if(this.sortTeams){
+        if(this.teams.length!=0){
+          this.teams.sort((a,b)=> a.team_name.localeCompare(b.team_name));
+        }
+      }
+    },
+    sortPlayersByName(){
+      if(this.sortByName){
+        if(this.players.length!=0){
+          this.players.sort((a,b)=> a.name.localeCompare(b.name));
+        }
+      }
+    },
+    sortPlayersByTeam(){
+      if(this.sortByTeam){
+        if(this.players.length!=0){
+          this.players.sort((a,b)=> a.team_name.localeCompare(b.team_name));
+        }
+      }
+    },
+
   },
 }
 

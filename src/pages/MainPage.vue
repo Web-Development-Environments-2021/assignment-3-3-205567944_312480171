@@ -1,32 +1,42 @@
 <template>
   <div class="container">
+    <!-- <h2> {{ myName }} !!</h2>
+    <h2>{{ myName2 }}!!</h2> -->
+    <h2> {{ myName3 }}!!</h2>
     <h1 class="title" align = "center">Main Page</h1>
       <div class="left-half">
-        <!-- <LeagueInfo></LeagueInfo> -->
+        <LeagueInfo></LeagueInfo>
       </div>
       <div class="right-half">
-      <LoginPage v-if="!$root.store.username" to="/login" tag="button"></LoginPage>
-      <!-- <FavoriteGames v-else></FavoriteGames> -->
+        <div v-if="!$root.store.username" to="/login">
+          <LoginPage></LoginPage>
+        </div>
+        <div v-else>
+          <FavoriteGames></FavoriteGames>
+        </div>
       </div>
    
   </div>
 </template>
 
 <script>
-// import LeagueInfo from "../components/LeagueInfo";
-// import FavoriteGames from "../components/FavoriteGames";
+import LeagueInfo from "../components/LeagueInfo";
+import FavoriteGames from "../components/FavoriteGames";
 import LoginPage from "../pages/LoginPage";
 export default {
   components: {
-    // LeagueInfo, 
+    LeagueInfo, 
     LoginPage, 
-    // FavoriteGames,
-  }
-  // data() {
-  //   return {
-  //     favoriteMatches: {},
-  //   };
-  // },
+    FavoriteGames,
+  },
+  data() {
+    return {
+      // myName: this.$root,
+      // myName2: $root.store,
+      myName3: this.$root.store.username,
+      favoriteMatches: {},
+    };
+  },
 };
 </script>
 
