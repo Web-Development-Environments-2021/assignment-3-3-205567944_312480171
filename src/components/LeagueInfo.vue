@@ -8,10 +8,10 @@
     >
       <b-card-title align = "center">{{leagueName}}</b-card-title>
       <b-card-text>
-        <ul class="game-content">
-        <li> Season: {{ season }} </li>
-        <li> Stage: {{ stage }} </li>
-        </ul>    
+        <div class="game-content">
+        <span> Season: {{ season }} </span><br>
+        <span> Stage: {{ stage }} </span><br>   
+        </div>
         <GamePreview
           :match_id="parseInt(next_match.match_id)" 
           :hostTeam="next_match.hostTeam" 
@@ -19,6 +19,7 @@
           :date_match_new="next_match.date_match_new" 
           :hour="next_match.hour" 
           :venue="next_match.venue_name" 
+          :image_venue="next_match.venue_image"
           :key="next_match.match_id">
         </GamePreview>
         
@@ -55,6 +56,7 @@ export default {
         this.season = response.data.current_season_name;
         this.stage = response.data.current_stage_name;
         this.next_match = response.data.next_match;
+        // console.log(this.next_match);
 
       } catch (err) {
         console.log(err.response);

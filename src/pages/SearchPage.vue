@@ -28,7 +28,7 @@
                 indicators
                 background="transparent"
                 img-width="20%"
-                img-height="10%"
+                img-height="11%"
                 style="text-shadow: 1px 1px 2px #555;"
                 @sliding-start="onSlideStart"
                 @sliding-end="onSlideEnd"
@@ -68,7 +68,7 @@
               <b-collapse id="collapse-2">
                 <b-card v-if="showDropDownPos===true" class="background-search">
                   <b-dropdown dropright size="sm" :text="buttonTitle" split-class="m-2">
-                    <b-dropdown-item @click="buttonTitle = i " v-for="i in 11" :key="i">{{ i }}</b-dropdown-item>
+                    <b-dropdown-item @click="buttonTitle = i.toString() " v-for="i in 11" :key="i">{{ i }}</b-dropdown-item>
                   </b-dropdown>
                 </b-card>
                 <b-card v-else-if="showText===true" class="background-search">
@@ -167,7 +167,6 @@ export default {
   },
   mounted(){
     this.lastQueryTerm = localStorage.getItem("lastQueryTerm");
-    this.sortTeams = localStorage.getItem("sortTeams");
 
     this.loadHistorySearch();
   },
@@ -184,13 +183,21 @@ export default {
           if (localStorage.lastQueryTeam) {
             this.searchTeam = localStorage.lastQueryTerm;
             this.teams = JSON.parse(localStorage.lastQueryTeam);
-            this.sortTeams = localStorage.sortTeams;
+            
+          }else if(localStorage.lastQueryPlayers){
+            this.searchPlayer = localStorage.lastQueryTermPlayer;
+            if(localStorage.lastQueryFilterPosition){
+              this.buttonTitle = localStorage.lastQueryFilterPosition;
+            }
+            if(localStorage.lastQueryFilterTeamName){
+              this.textTeam = localStorage.lastQueryFilterTeamName;
+            }
+             this.players = JSON.parse(localStorage.lastQueryPlayers);
           }
         } else {
           if (localStorage.lastQueryTeam) {
             localStorage.removeItem("lastQueryTeam");
             localStorage.removeItem("lastQueryTerm");
-            localStorage.removeItem("sortTeams");
           }
         }
       } catch (err) {
@@ -226,7 +233,11 @@ export default {
             if (this.$root.store.username) {
               localStorage.setItem("lastQueryTerm", this.searchTeam);
               localStorage.setItem("lastQueryTeam", JSON.stringify(this.teams));
-              localStorage.setItem("sortTeams", this.sortTeams);
+              localStorage.removeItem("lastQueryTermPlayer");
+              localStorage.removeItem("lastQueryFilterPosition");
+              localStorage.removeItem("lastQueryFilterTeamName");
+              localStorage.removeItem("lastQueryPlayers");
+
             }
             
 
@@ -239,33 +250,56 @@ export default {
       }
     },
     async findSearchPlayer(){
-      console.log(this.searchPlayer);
-      console.log(this.textTeam);
-      console.log(this.buttonTitle);
       if(this.searchPlayer!= ""){
         try{
             if(this.buttonTitle === "optional" && this.textTeam ===""){
               var response = await this.axios.get(
               `http://localhost:3000/search/searchPlayerByName/${this.searchPlayer}`,
               );
+              if (this.$root.store.username) {
+                localStorage.setItem("lastQueryTermPlayer", this.searchPlayer);
+                localStorage.removeItem("lastQueryFilterPosition");
+                localStorage.removeItem("lastQueryFilterTeamName");
+                localStorage.removeItem("lastQueryTeam");
+                localStorage.removeItem("lastQueryTerm");
+              }
             }
             else if (this.buttonTitle != "optional" && this.textTeam === ""){
               var response = await this.axios.get(
               `http://localhost:3000/search/searchPlayerByNameAndByPosition/player_name/${this.searchPlayer}/position_id/${this.buttonTitle}`,
               );
+              if (this.$root.store.username) {
+              localStorage.setItem("lastQueryTermPlayer", this.searchPlayer);
+              localStorage.setItem("lastQueryFilterPosition", this.buttonTitle);
+              localStorage.removeItem("lastQueryFilterTeamName");
+              localStorage.removeItem("lastQueryTeam");
+              localStorage.removeItem("lastQueryTerm");
+              
+              //  JSON.stringify(this.teams));
+              }
             }
             else if (this.buttonTitle === "optional" && this.textTeam != ""){
               var response = await this.axios.get(
               `http://localhost:3000/search/searchPlayerByNameAndByTeam/player_name/${this.searchPlayer}/team_name/${this.textTeam}`,
               );
-                
+              if (this.$root.store.username) {
+                localStorage.setItem("lastQueryTermPlayer", this.searchPlayer);
+                localStorage.setItem("lastQueryFilterTeamName", this.textTeam);
+                localStorage.removeItem("lastQueryFilterTeamName");
+                localStorage.removeItem("lastQueryTeam");
+                localStorage.removeItem("lastQueryTerm");
+              }
             }
-            console.log(response);
 
             if(response.data.status == 204)
               this.players = [];           
             else
               this.players = response.data;
+
+            if (this.$root.store.username) {
+              localStorage.setItem("lastQueryPlayers", JSON.stringify(this.players));
+            }
+
 
             this.searchPlayerClicked = true;
             this.searchTeamClicked = false;

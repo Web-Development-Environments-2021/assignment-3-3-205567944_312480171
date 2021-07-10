@@ -98,17 +98,23 @@ Vue.use(VueAxios, axios);
 Vue.config.productionTip = false;
 
 const shared_data = {
-  username: "",
-  lastQueryTeam: "",
-  lastQueryTerm: "",
-  sortTeams: false,
+  username: undefined,
+  lastQueryTeam: undefined,
+  lastQueryTerm: undefined,
+  lastQueryTermPlayer: undefined,
+  lastQueryFilterPosition: undefined,
+  lastQueryFilterTeamName: undefined,
+  lastQueryPlayers : undefined,
   BASE_URL: "http://localhost:3000",
   login(username) {
     localStorage.setItem("username", username);
     this.username = username;
     this.lastQueryTeam = "";
     this.lastQueryTerm = "";
-    this.sortTeams = false;
+    this.lastQueryTermPlayer = "";
+    this.lastQueryFilterPosition = "";
+    this.lastQueryFilterTeamName = "";
+    this.lastQueryPlayers = "";
     console.log("login", this.username);
   },
   isAdmin() {

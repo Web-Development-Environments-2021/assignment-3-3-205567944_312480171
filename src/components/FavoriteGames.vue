@@ -24,6 +24,7 @@
                         :date_match_new="match.date_game" 
                         :hour="match.hour" 
                         :venue="match.venue"
+                        :image_venue="match.image_venue"
                         :key="match.match_id"
                         ></GamePreview>
                   </template>

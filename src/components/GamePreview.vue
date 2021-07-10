@@ -1,10 +1,11 @@
 <template>
   <div class="game-preview">
-      <li> host: {{ hostTeam }}</li>
-      <li> guest: {{ awayTeam }}</li>
-      <li> date: {{ date_match_new }}</li>
-      <li> time: {{ hour }}</li>
-      <li> venue: {{ venue }}</li>
+      <span align = "center"> host: {{ hostTeam }}</span><br>
+      <span> guest: {{ awayTeam }}</span><br>
+      <span> date: {{ date_match_new }}</span><br>
+      <span> time: {{ hour }}</span><br>
+      <span> venue: {{ venue }}</span><br>
+      <img style="width: 180px; height: 110px;" :src=image_venue>
   </div>
 </template>
 
@@ -35,7 +36,10 @@ export default {
       venue: {
         type: String,
         //required: true
-      }
+      },
+      image_venue: {
+        type: String
+      } 
   }, 
   mounted(){
     console.log("game preview mounted")
