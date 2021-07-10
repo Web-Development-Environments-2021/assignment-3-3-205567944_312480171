@@ -6,25 +6,23 @@
       style="max-width: 20rem;"
       class="mb-2"
     >
-      <b-card-title>{{leagueName}}</b-card-title>
+      <b-card-title align = "center">{{leagueName}}</b-card-title>
       <b-card-text>
-        Season: {{ season }}
-        <br/>
-        Stage: {{ stage }}
-        <br/>
-        <div>     
-          <GamePreview
-            :match_id="next_match.match_id" 
-            :hostTeam="next_match.hostTeam" 
-            :awayTeam="next_match.awayTeam" 
-            :date_match_new="next_match.date_match_new" 
-            :hour="next_match.hour" 
-            :venue="next_match.venue_name" 
-            :key="next_match.match_id">
-          </GamePreview>
-        </div>
+        <ul class="game-content">
+        <li> Season: {{ season }} </li>
+        <li> Stage: {{ stage }} </li>
+        </ul>    
+        <GamePreview
+          :match_id="parseInt(next_match.match_id)" 
+          :hostTeam="next_match.hostTeam" 
+          :awayTeam="next_match.awayTeam" 
+          :date_match_new="next_match.date_match_new" 
+          :hour="next_match.hour" 
+          :venue="next_match.venue_name" 
+          :key="next_match.match_id">
+        </GamePreview>
+        
       </b-card-text>
-      <b-button href="#" variant="primary">Go somewhere</b-button>
     </b-card>
   </div>
 </template>
@@ -44,6 +42,9 @@ export default {
       next_match : [],
     };
   },
+  created() {
+    this.getDetails();   
+  },
   methods: {
     async getDetails() {
       try {
@@ -60,24 +61,24 @@ export default {
       }
     },
   },
-  mounted(){
-    console.log("league details");
-    this.getDetails(); 
-  }
 }
 </script>
 
 <style>
+.game-content {
+  width: 100%;
+  overflow: hidden;
+}
 .league-preview {
   display: inline-block;
-  width: 250px;
-  height: 200px;
+  width: 50%;
+  height: 10%;
   position: relative;
   margin: 10px 10px;
   border-style: solid;
   border-radius: 10px;
   border-width: 5px;
-  border-color:rgb(44, 89, 116);
+  border-color:rgb(63, 67, 70);
 }
 
 .league-preview .league-title {

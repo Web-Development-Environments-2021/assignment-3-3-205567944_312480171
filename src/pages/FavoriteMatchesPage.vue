@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="favorite_matches_user">
       <h1 style="text-align:center">Your favorite matches</h1>
       <span v-if="wait"> please wait..</span>
       <div v-else>
@@ -43,4 +43,8 @@ export default {
 </script>
 
 <style>
+.favorite_matches_user {
+    max-width: 40%;
+    max-height: 40%;
+  }
 </style>

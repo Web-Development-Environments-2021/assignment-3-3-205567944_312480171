@@ -3,8 +3,28 @@ import App from "./App.vue";
 import VueAxios from "vue-axios";
 import axios from "axios";
 
+
+
 import routes from "./routes";
 import VueRouter from "vue-router";
+import VueCookies from 'vue-cookies';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import Cloudinary from 'cloudinary-vue';
+Vue.use(Cloudinary, {
+  configuration: {
+    cloudName: "dbur1pbkj"
+    
+    // API KEY: 974382264129746,
+    // API Secret: ueJ_403GHRv36Fd-G-rHcXisxAM,
+    // CLOUDINARY_URL=cloudinary://974382264129746.ueJ_403GHRv36Fd-G-rHcXisxAM@dbur1pbkj
+
+
+
+  }
+});
+Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
+Vue.use(VueCookies);
 Vue.use(VueRouter);
 const router = new VueRouter({
   routes
@@ -26,6 +46,7 @@ import {
   LayoutPlugin, 
   InputGroupPlugin,
   TablePlugin,
+  FormDatepickerPlugin,
   CarouselPlugin
 } from "bootstrap-vue";
 [
@@ -40,7 +61,8 @@ import {
   FormSelectPlugin,
   AlertPlugin,
   ToastPlugin,
-  LayoutPlugin, 
+  LayoutPlugin,
+  FormDatepickerPlugin, 
   InputGroupPlugin
 ].forEach((x) => Vue.use(x));
 
@@ -69,28 +91,62 @@ axios.interceptors.response.use(
   }
 );
 
+axios.defaults.withCredentials = true;
+
 Vue.use(VueAxios, axios);
 
 Vue.config.productionTip = false;
 
 const shared_data = {
-  username: undefined,
-  //username: localStorage.username,
+  username: "",
+  lastQueryTeam: "",
+  lastQueryTerm: "",
+  sortTeams: false,
   BASE_URL: "http://localhost:3000",
-  //username: "hilla",
   login(username) {
     localStorage.setItem("username", username);
     this.username = username;
+    this.lastQueryTeam = "";
+    this.lastQueryTerm = "";
+    this.sortTeams = false;
     console.log("login", this.username);
+  },
+  isAdmin() {
+    if(this.username === "niv"){
+      console.log("admin logged in");
+      return true;
+    }
+    return false;
   },
   logout() {
     console.log("logout");
+    Vue.$cookies.remove("session"); 
     localStorage.removeItem("username");
+    localStorage.clear();
     this.username = undefined;
   }
 };
 console.log(shared_data);
 // Vue.prototype.$root.store = shared_data;
+
+router.beforeEach((to, from, next) => {	
+  // if there was a transition from logged in to session expired or localStorage was deleted	
+  // if we try to enter auth required pages and we are not authorized	
+  //console.log(shared_data.username);	
+  //console.log(Vue.$cookies.get("session"));	
+  if (shared_data.username === undefined || !Vue.$cookies.get("session")) {	
+    if (	
+      (shared_data.username === undefined && Vue.$cookies.get("session")) ||	
+      (shared_data.username !== undefined && !Vue.$cookies.get("session"))	
+    ) {	
+      shared_data.logout();	
+    }	
+    // if the route requires Authorization, (and we know the user is not authorized), we redirect to login page	
+    if (to.matched.some((route) => route.meta.requiresAuth)) {	
+      next({ name: "login" });	
+    } else next();	
+  } else next();	
+});
 
 new Vue({
   router,

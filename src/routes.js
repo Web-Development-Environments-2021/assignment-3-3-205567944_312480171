@@ -18,19 +18,9 @@ const routes = [
     component: () => import("./pages/LoginPage")
   },
   {
-    path: "/user/favoriteTeams",
-    name: "favoriteTeams",
-    component: () => import("./pages/FavoriteTeamsPage")
-  },
-  {
     path: "/user/favoriteMatches",
     name: "favoriteMatches",
     component: () => import("./pages/FavoriteMatchesPage")
-  },
-  {
-    path: "/user/favoritePlayers",
-    name: "favoritePlayers",
-    component: () => import("./pages/FavoritePlayersPage")
   },
   {
     path: "/about",
@@ -57,15 +47,27 @@ const routes = [
     name: "player_page",
     component: () => import("./pages/PlayerPage")
   },
+
   {
     path: "/team_page/:id",
     name: "team_page_by_id",
     component: () => import("./pages/TeamPage")
   },
+
   {
     path: "/team_page",
     name: "team_page",
     component: () => import("./pages/TeamPage")
+  },
+  {
+    path: "/add_match",
+    name: "addNewMatch",
+    component: () => import("./pages/AddMatchPage")
+  },
+  {
+    path: "/matches_preview",
+    name: "matchesPreview",
+    component: () => import("./pages/LeagueManagmentTable")
   },
   {
     path: "*",

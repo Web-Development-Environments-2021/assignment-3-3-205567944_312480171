@@ -7,7 +7,7 @@
           <b-input-group id="search-input">
             <b-form-input v-model="searchTeam"></b-form-input>
             <b-input-group-append>
-              <b-button variant="success" @click="findSearchTeam">Search</b-button>
+              <b-button class="navbar navbar-dark bg-dark" variant="success" @click="findSearchTeam">Search</b-button>
             </b-input-group-append>
           </b-input-group>
           <br>
@@ -22,14 +22,13 @@
         <div class="content">
           <b-carousel
                 id="carousel-1"
-                v-model="slide"
-                v-if="searchTeamClicked"
                 :interval="10000"
+                v-if="searchTeamClicked || lastQueryTerm!='' "
                 controls
                 indicators
-                background="grey"
-                img-width="900"
-                img-height="480"
+                background="transparent"
+                img-width="20%"
+                img-height="10%"
                 style="text-shadow: 1px 1px 2px #555;"
                 @sliding-start="onSlideStart"
                 @sliding-end="onSlideEnd"
@@ -37,6 +36,7 @@
                   <b-carousel-slide v-for="(team, index) in teams" img-blank :key="index">
                           <TeamPreview  :team_name="team.team_name"  
                           :teamImageURL="team.logo"
+                          :team_id="team.team_id"
                           :key="team.team_id"></TeamPreview>
                   </b-carousel-slide>
           </b-carousel>
@@ -49,6 +49,9 @@
         <div>
           <b-input-group id="search-input">
             <b-form-input v-model="searchPlayer"></b-form-input>
+            <b-input-group-append>
+              <b-button class="navbar navbar-dark bg-dark" variant="success" @click="findSearchPlayer">Search</b-button>
+            </b-input-group-append>
           </b-input-group>
           <br/>
           <div align="center"> 
@@ -58,7 +61,7 @@
               <b-button @click="showDropDown" v-b-toggle.collapse-2 class="m-1">Position</b-button>
               <!-- Using value -->
               <b-button @click="showTextTeam" v-b-toggle="'collapse-2'" class="m-1">Team name</b-button>
-              <b-button align= "center" variant="success" @click="findSearchPlayer">Search</b-button>
+              <!-- <b-button align= "center" @click="findSearchPlayer" class="navbar navbar-dark bg-dark" variant="success">Search</b-button> -->
               <br>
               <br>
               <!-- Element to collapse -->
@@ -98,15 +101,14 @@
           <div class="content">
             <b-carousel
                   id="carousel-2"
-                  v-model="slide"
                   v-if="searchPlayerClicked && players.length>0"
                   :interval="10000"
                   controls
                   indicators
-                  background="grey"
-                  img-width="900"
-                  img-height="600"
-                  style="text-shadow: 1px 1px 2px #555;"
+                  background="transparent"
+                  img-width="20%"
+                  img-height="12%"
+                  style="opacity:1;text-shadow: 1px 1px 2px #555;"
                   @sliding-start="onSlideStart"
                   @sliding-end="onSlideEnd"
                   >
@@ -120,12 +122,8 @@
                             </PlayerPreview>
                     </b-carousel-slide>
             </b-carousel>
-          
          </div>
-          <!-- Your search Query: {{ searchPlayer }} -->
         </div>
-      <!-- <LoginPage v-if="!$root.store.username" to="/login" tag="button"></LoginPage> -->
-      <!-- <FavoriteGames v-else></FavoriteGames> -->
       </div>  
     </div>
   </div>
@@ -145,7 +143,6 @@ export default {
       players: [],
       textTeam: "",
       searchPlayer: "",
-      // searchTeamByPlayer:"",
       showDropDownPos: true, //showDropDownPos and showText are check if one of the filters is on
       showText: true,
       searchTeamClicked: false, /// hide/show the answers of the other search (there is a team search and a player search)
@@ -158,26 +155,47 @@ export default {
       searchTeam: "",
       searchQuery: "",
       teams: [],
+      unsortTeams : [],
       slide: 0,
       sliding: null,
+
+      ///local storage of team search
+      lastQueryTeam: "",
+      lastQueryTerm: "",
+
     };
   },
-  // mounted(){
-  //   try{
-  //     if(this.$root.store.username){
-  //       this.getLastQueryResults();
-  //     }
-  //   }
-  //   catch(error){
-  //     console.log(error);
-  //   }
-  // },
+  mounted(){
+    this.lastQueryTerm = localStorage.getItem("lastQueryTerm");
+    this.sortTeams = localStorage.getItem("sortTeams");
+
+    this.loadHistorySearch();
+  },
   methods: {
-    onSlideStart(slide) {
+    onSlideStart() {
       this.sliding = true
     },
-    onSlideEnd(slide) {
+    onSlideEnd() {
       this.sliding = false
+    },
+    async loadHistorySearch() {
+      try {
+        if (this.$root.store.username) {
+          if (localStorage.lastQueryTeam) {
+            this.searchTeam = localStorage.lastQueryTerm;
+            this.teams = JSON.parse(localStorage.lastQueryTeam);
+            this.sortTeams = localStorage.sortTeams;
+          }
+        } else {
+          if (localStorage.lastQueryTeam) {
+            localStorage.removeItem("lastQueryTeam");
+            localStorage.removeItem("lastQueryTerm");
+            localStorage.removeItem("sortTeams");
+          }
+        }
+      } catch (err) {
+        console.log(err.response);
+      }
     },
     async showDropDown(){
       this.showDropDownPos = true;
@@ -190,35 +208,35 @@ export default {
       this.showText = true;
     },
     async findSearchTeam(){
-      console.log(this.searchTeam);
       if(this.searchTeam!= ""){
-        if(this.searchQuery!=""){
-          if(this.$root.store.username){//if user is logged in, save last query search
-            this.$root.store.saveLastSearch(this.searchQuery);
-          }
-          this.search=true;
           try {
             const response = await this.axios.get(
               `http://localhost:3000/search/searchTeamByName/${this.searchTeam}`,
             );
-            if(response.data.status == 204)
-              this.teams = [];           
-            else
+            if(response.data.status == 204){
+              this.teams = [];      
+              this.unsortTeams = [];     
+            }
+            else{
               this.teams = response.data;
-
-            console.log(response);
+              this.unsortTeams = response.data;
+            }
             this.searchTeamClicked = true;
             this.searchPlayerClicked = false;
+            if (this.$root.store.username) {
+              localStorage.setItem("lastQueryTerm", this.searchTeam);
+              localStorage.setItem("lastQueryTeam", JSON.stringify(this.teams));
+              localStorage.setItem("sortTeams", this.sortTeams);
+            }
+            
+
           } catch (error) {
-            console.log("error in teamView")
             console.log(error);
           }
-      }
       }
       else{
         alert("Please insert name of team!")
       }
-      this.search=false;
     },
     async findSearchPlayer(){
       console.log(this.searchPlayer);
@@ -291,7 +309,7 @@ export default {
 
 #search-input {
   margin-left: 20px; 
-  width: 500px; 
+  width: 80%; 
   /* border: 100px; */
 }
 /* Pattern styles */
@@ -310,29 +328,36 @@ export default {
 }
 
 .background-search{
-  background-color: grey;
+  /* background-color: rgb(194, 64, 64); */
+  background-color: transparent;
+  border:0;
+
 }
 
 .carousel-1 {
-    border-radius: 55px 55px 55px 55px;
-    overflow: hidden;
-    height: 900;
-    width: 480;
+    /* border-radius: 55px 55px 55px 55px; */
+    height: 20%;
+    width: 10%;
     margin-bottom: 60px;
     margin-top: 40px;
     margin-left: 200px;
     margin-right: 200px;
+    background-color: transparent;
+    opacity: 1;
+
 }
 
 .carousel-2 {
     border-radius: 55px 55px 55px 55px;
     overflow: hidden;
-    height: 2000;
-    width: 480;
+    height: 50%;
+    width: 50%;
     margin-bottom: 60px;
     margin-top: 40px;
     margin-left: 200px;
     margin-right: 200px;
+        background-color: transparent;
+
 }
 
 b-carousel-slid {

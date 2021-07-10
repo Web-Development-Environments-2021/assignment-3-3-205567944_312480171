@@ -35,17 +35,13 @@
           Password is required
         </b-form-invalid-feedback>
       </b-form-group>
-
+      <div align = "center">
       <b-button
         type="submit"
         variant="primary"
         style="width:100px;display:block;"
-        class="mx-auto w-100"
-        >Login</b-button
-      >
-      <div class="mt-2">
-        Do not have an account yet?
-        <router-link to="register"> Register in here</router-link>
+        class="navbar navbar-dark bg-dark"
+        >Login</b-button>
       </div>
     </b-form>
     <b-alert
@@ -57,9 +53,6 @@
     >
       Login failed: {{ form.submitError }}
     </b-alert>
-    <!-- <b-card class="mt-3" header="Form Data Result">
-      <pre class="m-0">{{ form }}</pre>
-    </b-card> -->
   </div>
 </template>
 
@@ -93,43 +86,25 @@ export default {
     },
     async Login() {
       try {
-        console.log("ggggg");
         const response = await this.axios.post("http://localhost:3000/login", {
           username: this.form.username,
           password: this.form.password,
         });
-        // .then(function(response){
-        //   document.cookie = this.$cookies.get("session");
-        // })
-        console.log(response);
-        // console.log(this.$cookies.get("session"));
-
-        if (response.status === 200) {
-          this.$root.loggedIn = true;
-          this.$root.store.username = this.form.username;  
-          console.log(this.$root.store);
-          console.log(this.$root.store.login);
-          this.$root.store.login(this.form.username);
-          this.$router.push("/");
-        } else {
-          this.form.submitError = err.response.data.message;
+        this.$root.store.login(this.form.username);
+        if (this.$route.path != "/") {
+          this.$router.push("/").catch();
         }
       } catch (err) {
         console.log(err.response);
-        // this.form.submitError = response.data;
-        alert("Incorrect details !");
+        this.form.submitError = err.response.data.message;
       }
-      // console.log(this.$cookies.get("session"));
     },
     onLogin() {
-      console.log("login method called");
       this.form.submitError = undefined;
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
         return;
       }
-      // console.log("login method go");
-
       this.Login();
     },
   },

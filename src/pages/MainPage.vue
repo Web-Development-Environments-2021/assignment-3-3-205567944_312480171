@@ -1,9 +1,8 @@
 <template>
   <div class="container">
-    <!-- <h2> {{ myName }} !!</h2>
-    <h2>{{ myName2 }}!!</h2> -->
-    <h2> {{ myName3 }}!!</h2>
     <h1 class="title" align = "center">Main Page</h1>
+    <span v-if="wait"> please wait..</span>
+    <div v-else>
       <div class="left-half">
         <LeagueInfo></LeagueInfo>
       </div>
@@ -12,9 +11,15 @@
           <LoginPage></LoginPage>
         </div>
         <div v-else>
+          <div v-if="favoriteMatches.length>0">
           <FavoriteGames></FavoriteGames>
+          </div>
+          <div v-else>
+            <h3 class="title" >There are no matches to load</h3>
+          </div>
         </div>
       </div>
+    </div>
    
   </div>
 </template>
@@ -31,11 +36,25 @@ export default {
   },
   data() {
     return {
-      // myName: this.$root,
-      // myName2: $root.store,
-      myName3: this.$root.store.username,
-      favoriteMatches: {},
+      wait:true,
+      favoriteMatches: [],
     };
+  },
+  methods:{ 
+    async retrieveFavoriteMatchesTop3(){
+        this.wait=false;
+        const response=await this.axios.get(`http://localhost:3000/users/favoriteMatchesTop3`);
+        if(response.status==200){
+            this.favoriteMatches=response.data;
+        }
+        else{
+          this.favoriteMatches = [];
+        }
+         
+    }
+  },
+  created() {
+    this.retrieveFavoriteMatchesTop3();   
   },
 };
 </script>

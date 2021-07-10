@@ -1,15 +1,37 @@
 <template>
-  <div>
-    <GamePreview
-      v-for="g in matches"
-      :match_id="g.match_id" 
-      :hostTeam="g.local_team" 
-      :awayTeam="g.visitor_Team" 
-      :date_match_new="g.date_game" 
-      :hour="g.hour" 
-      :venue="g.venue_name"
-      :key="g.match_id"></GamePreview>
-  </div>
+   <div align = "left">
+    <b-card align = "left" style="background:transparent; border:0;">      
+        <b-card-text style="color: black;"> 
+          <b-carousel
+          id="carousel-1"
+          :interval="10000"
+          controls
+          indicators
+          background="transparent"
+          img-width="30%"
+          img-height="20%"
+          style="text-shadow: 1px 1px 2px #555;"
+          @sliding-start="onSlideStart"
+          @sliding-end="onSlideEnd"
+          >
+          <!-- Text slides with image -->
+              <b-carousel-slide v-for="(match, index) in matches" img-blank :key="index">
+                  <template align = "left">
+                      <GamePreview
+                        :match_id="match.match_id" 
+                        :hostTeam="match.local_team" 
+                        :awayTeam="match.visitor_team" 
+                        :date_match_new="match.date_game" 
+                        :hour="match.hour" 
+                        :venue="match.venue"
+                        :key="match.match_id"
+                        ></GamePreview>
+                  </template>
+              </b-carousel-slide>
+          </b-carousel>               
+        </b-card-text>
+    </b-card>
+    </div>
 </template>
 
 <script>
@@ -22,6 +44,8 @@ export default {
   data() {
     return {
       matches: [],
+      sliding: null,
+
     };
   },
   created() {
@@ -29,21 +53,24 @@ export default {
     this.updateMatches();   
   },
   methods: {
+    onSlideStart() {
+        this.sliding = true
+    },
+    onSlideEnd() {
+        this.sliding = false
+    },
     async updateMatches(){
       console.log("response");
       try {
-        console.log("here");
-        console.log(this.$root.store);
-        console.log(this.$root.store.BASE_URL + "/users/favoriteMatchesTop3");
         const response = await this.axios.get(
           this.$root.store.BASE_URL + "/users/favoriteMatchesTop3",
         );
-        console.log(response);
-        console.log(response.data);
         const games = response.data;
-        this.matches = [];
+        if(games.length == 0){
+
+        }
+        console.log(games);
         this.matches.push(...games);
-        console.log(response);
       } catch (error) {
         console.log("error in update updateMatches")
         console.log(error);
@@ -53,4 +80,17 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.carousel-1 {
+    /* border-radius: 55px 55px 55px 55px; */
+    height: 10%;
+    width: 10%;
+    margin-bottom: 60px;
+    margin-top: 20%;
+    margin-left: 20%;
+    margin-right: 200px;
+    background-color: transparent;
+    opacity: 1;
+
+}
+</style>

@@ -1,32 +1,31 @@
 <template>
   <div>
-      <b-card-text>
+    <b-card-text>
+      
+      <div align = "center">     
+        <PlayerPreview
+          :id="id" 
+          :team_name="team_name" 
+          :name="name" 
+          :position="position" 
+          :imageURL="imageURL" 
+          >
+        </PlayerPreview>
         
-        <div>     
-          <PlayerPreview
-            :id="id" 
-            :team_name="team_name" 
-            :name="name" 
-            :position="position" 
-            :imageURL="imageURL" 
-            >
-          </PlayerPreview>
-        </div>
-        <div align = "center">
-        Common Name: {{ common_name }}
-        <br/>
-        Nationality: {{ nationality }}
-        <br/>
-        Birth Date: {{ birth }}
-        <br/>
-        Birth Country: {{ birthcountry }}
-        <br/>
-        Height: {{ height }}
-        <br/>
-        Weight: {{ weight }}
-        <br/>
-        </div>
-      </b-card-text>
+      Common Name: {{ common_name }}
+      <br/>
+      Nationality: {{ nationality }}
+      <br/>
+      Birth Date: {{ birth }}
+      <br/>
+      Birth Country: {{ birthcountry }}
+      <br/>
+      Height: {{ height }}
+      <br/>
+      Weight: {{ weight }}
+      <br/>
+      </div>
+    </b-card-text>
   </div>
 </template>
 
@@ -59,7 +58,6 @@ export default {
             const response = await this.axios.get(
             `http://localhost:3000/players/fullPlayerInfo/id/[${this.$route.params.id}]`
             );
-            console.log(response.data);
             this.id = response.data[0].id;
             this.name = response.data[0].name;
             this.imageURL = response.data[0].image;
@@ -72,8 +70,6 @@ export default {
             this.birthcountry = response.data[0].birthcountry;
             this.height = response.data[0].height;
             this.weight = response.data[0].weight;
-            console.log("finish func");
-
 
         } catch (err) {
         console.log(err.response);
@@ -81,7 +77,6 @@ export default {
     },
   },
   mounted(){
-    console.log(" full details");
     this.getFull(); 
   }
 };

@@ -1,15 +1,10 @@
 <template>
   <div class="game-preview">
-    <div class="game-title">
-      <b>Game Id:</b> {{ match_id }}
-    </div>
-    <ul class="game-content">
       <li> host: {{ hostTeam }}</li>
       <li> guest: {{ awayTeam }}</li>
       <li> date: {{ date_match_new }}</li>
       <li> time: {{ hour }}</li>
       <li> venue: {{ venue }}</li>
-    </ul>
   </div>
 </template>
 
@@ -19,27 +14,27 @@ export default {
   props: {
       match_id: {
         type: Number,
-        required: true
+        //required: true
       },
       hostTeam: {
         type: String,
-        required: true
+        //required: true
       },
       awayTeam: {
         type: String,
-        required: true
+        //required: true
       },
       date_match_new: {
         type: String,
-        required: true
+        //required: true
       },
       hour: {
         type: String,
-        required: true
+        //required: true
       },
       venue: {
         type: String,
-        required: true
+        //required: true
       }
   }, 
   mounted(){
@@ -58,7 +53,8 @@ export default {
   border-style: solid;
   border-radius: 10px;
   border-width: 5px;
-  border-color:cadetblue;
+  border: none;
+  color: black;
 }
 
 .game-preview .game-title {
